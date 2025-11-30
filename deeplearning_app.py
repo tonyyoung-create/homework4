@@ -13,17 +13,39 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import torch
 from pathlib import Path
 import sys
 import json
 
+# 嘗試導入深度學習框架（可選）
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    st.warning("⚠️ PyTorch 未安裝。CRISP-DM 深度學習功能將受限。")
+
+try:
+    import tensorflow
+    TF_AVAILABLE = True
+except ImportError:
+    TF_AVAILABLE = False
+
 # 添加本地模塊
 sys.path.insert(0, str(Path(__file__).parent))
 
-from data_layer import DataExplorer, DataPreprocessor, DataVisualizer, crisp_dm_data_understanding
-from model_layer import NeuralNetwork, ModelTrainer, create_data_loaders, crisp_dm_modeling
-from evaluation_layer import ModelEvaluator, RegressionEvaluator, EvaluationReport, crisp_dm_evaluation
+# 只在有可用框架時導入深度學習模塊
+if TORCH_AVAILABLE or TF_AVAILABLE:
+    try:
+        from data_layer import DataExplorer, DataPreprocessor, DataVisualizer, crisp_dm_data_understanding
+        from model_layer import NeuralNetwork, ModelTrainer, create_data_loaders, crisp_dm_modeling
+        from evaluation_layer import ModelEvaluator, RegressionEvaluator, EvaluationReport, crisp_dm_evaluation
+        ML_MODULES_AVAILABLE = True
+    except ImportError as e:
+        ML_MODULES_AVAILABLE = False
+        st.error(f"❌ 無法導入機器學習模塊: {str(e)}")
+else:
+    ML_MODULES_AVAILABLE = False
 
 
 # 頁面配置
@@ -151,6 +173,26 @@ class CRISPDMApp:
 
 def main():
     """主應用"""
+    
+    # 檢查深度學習框架可用性
+    if not ML_MODULES_AVAILABLE:
+        st.error("❌ 無法啟動 CRISP-DM 深度學習工具")
+        st.warning("""
+        需要安裝以下依賴之一：
+        
+        **選項 1: 安裝 PyTorch (推薦)**
+        ```bash
+        pip install torch torchvision
+        ```
+        
+        **選項 2: 安裝 TensorFlow**
+        ```bash
+        pip install tensorflow
+        ```
+        
+        請在安裝後重新運行此應用。
+        """)
+        return
     
     # 初始化應用
     app = CRISPDMApp()

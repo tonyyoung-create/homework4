@@ -15,8 +15,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from cot_dialog import render_cot_interface
-from deeplearning_app import CRISPDMApp, render_business_understanding, render_data_understanding, \
-    render_data_preparation, render_modeling, render_evaluation, render_deployment
+
+# 嘗試導入深度學習相關模塊
+try:
+    from deeplearning_app import CRISPDMApp, render_business_understanding, render_data_understanding, \
+        render_data_preparation, render_modeling, render_evaluation, render_deployment, ML_MODULES_AVAILABLE
+    CRISP_DM_AVAILABLE = ML_MODULES_AVAILABLE
+except ImportError as e:
+    CRISP_DM_AVAILABLE = False
+    CRISPDMApp = None
 
 
 # 頁面配置
@@ -142,6 +149,30 @@ def render_tab_cot():
 
 def render_tab_crisp_dm():
     """渲染 CRISP-DM Tab"""
+    
+    # 檢查 CRISP-DM 是否可用
+    if not CRISP_DM_AVAILABLE:
+        st.error("❌ CRISP-DM 深度學習工具不可用")
+        st.warning("""
+        需要安裝深度學習框架。請選擇以下之一：
+        
+        **選項 1: 安裝 PyTorch (推薦)**
+        ```bash
+        pip install torch torchvision
+        ```
+        
+        **選項 2: 安裝 TensorFlow**
+        ```bash
+        pip install tensorflow
+        ```
+        
+        安裝完成後，重新啟動應用即可使用此功能。
+        
+        ---
+        
+        💡 **提示**: 您仍然可以使用左側的 🤖 對話軟體功能，無需任何額外依賴！
+        """)
+        return
     
     # 初始化應用
     app = CRISPDMApp()
