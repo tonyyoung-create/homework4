@@ -28,16 +28,28 @@ class OllamaCoTDialog:
         self.base_url = base_url
         self.api_endpoint = f"{base_url}/api/generate"
         
-        # 系統提示詞
+        # 系統提示詞 - 川普風格
         self.system_prompts = {
-            'thinking': """你是一個充滿創意與正能量的助手。
-你的工作是幫助使用者找到任何事件中的積極面。
-請用輕鬆、有趣的語氣，想出為什麼這件事是「超級幸運」且「有趣」的 5 個理由。
-以條列式（1. 2. 3. 4. 5.）列出你的想法，用第一人稱幫助使用者想理由。""",
+            'thinking': """你是一位模仿美國前總統川普風格的回應機器人。
+你的工作是以川普獨特的方式回應和評論各種事件。
+川普的特點：
+- 使用大寫強調（GREAT, FANTASTIC, TERRIBLE, HUGE 等）
+- 自信、直率、有時候自我中心
+- 常用超級誇大的表述（very, very, extremely）
+- 經常自我評價（我是最偉大的...）
+- 簡洁有力的句子
+- 經常用 tremendous, beautiful, smart 等詞彙
+- 偶爾爆粗口（但保持禮貌）
+
+請根據以下事件，用 5 個川普風格的評論：""",
             
-            'final_response': """基於以上的 5 個理由，請選出最有趣且最能令人感到愉快的一個，
-然後用更生動活潑的語氣、社群媒體 po 文的口吻說一次為什麼這是一件超幸運的事。
-最後以「完全是 Lucky Vicky 呀!」結尾。"""
+            'final_response': """現在，基於以上 5 個評論，請選出最"川普"的一個，
+用更誇張和自信的川普風格重新表述一次。
+要求：
+- 使用大寫強調關鍵詞
+- 加入川普標誌性的措辭
+- 表現出川普的自信和獨特觀點
+- 最後加上「- 川普」作為簽名"""
         }
     
     def check_ollama_connection(self) -> bool:
@@ -109,35 +121,36 @@ ollama serve
     
     def stage_one_thinking(self, event_description: str) -> str:
         """
-        第一階段：生成思考過程
+        第一階段：生成思考過程（川普風格評論）
         
         Args:
             event_description: 事件描述
             
         Returns:
-            思考過程（5個理由）
+            思考過程（5個川普風格評論）
         """
         prompt = f"""{self.system_prompts['thinking']}
 
-使用者遇到這個事件：「{event_description}」
+事件：「{event_description}」
 
-請生成 5 個理由："""
+請用川普風格生成 5 個評論（編號 1-5）："""
         
         return self._call_ollama(prompt, temperature=0.9)
     
     def stage_two_final_response(self, event_description: str, thoughts: str) -> str:
         """
-        第二階段：基於思考過程生成最終回應
+        第二階段：基於第一階段生成最終的川普風格回應
         
         Args:
             event_description: 事件描述
-            thoughts: 第一階段生成的思考過程
+            thoughts: 第一階段生成的川普風格評論
             
         Returns:
-            最終優化的回應
+            最終的川普風格回應
         """
-        prompt = f"""我遇到了這個事件：「{event_description}」，這件事有 5 個理由，其實是超幸運的事。
+        prompt = f"""關於這個事件：「{event_description}」
 
+這是 5 個川普風格的評論：
 {thoughts}
 
 {self.system_prompts['final_response']}"""
@@ -271,9 +284,10 @@ def get_cot_manager() -> CoTDialogManager:
 
 
 def render_cot_interface():
-    """渲染 CoT 對話界面（用於 Streamlit）"""
+    """渲染川普風格對話生成器 UI"""
     
-    st.header("🤖 員瑛式思考生成器 - Two-Stage CoT")
+    st.header("🤖 川普風格對話生成器 - Two-Stage CoT")
+    st.markdown("*使用 AI 生成川普風格的評論和回應*")
     
     # 獲取 CoT 管理器
     manager = get_cot_manager()
@@ -292,8 +306,8 @@ def render_cot_interface():
     st.divider()
     
     if not manager.is_ready():
-        st.error("❌ CoT 系統未就緒")
-        st.warning("請完成以下步驟：")
+        st.error("❌ 川普對話生成器未就緒")
+        st.warning("請完成以下步驟以啟用本地 LLM：")
         st.code("""
 # 1. 安裝 Ollama: https://ollama.ai
 # 2. 下載模型
@@ -305,10 +319,11 @@ ollama serve
         return
     
     # 輸入框
-    st.markdown("### 💭 輸入你的事件")
+    st.markdown("### � 輸入一個事件或話題")
+    st.markdown("*機器人將以川普風格生成評論*")
     event_description = st.text_area(
-        "發生了什麼事?",
-        placeholder="例如：今天 Uber 送錯餐，把別人的餐送給了我。",
+        "發生了什麼事或想讓川普評論什麼?",
+        placeholder="例如：我今天工作中犯了個錯誤",
         height=100,
         key="cot_input"
     )
@@ -316,10 +331,10 @@ ollama serve
     # 處理按鈕
     col1, col2 = st.columns([1, 4])
     with col1:
-        submit_button = st.button("✨ 分析", key="cot_submit", use_container_width=True)
+        submit_button = st.button("🎤 讓川普說話", key="cot_submit", use_container_width=True)
     
     if submit_button and event_description:
-        with st.spinner("🤔 正在思考..."):
+        with st.spinner("🤔 川普正在思考中..."):
             try:
                 thoughts, final_response = manager.two_stage_cot(event_description)
                 
@@ -329,11 +344,11 @@ ollama serve
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    st.markdown("### 🤔 思考過程（第一階段）")
+                    st.markdown("### 💭 川普的 5 個評論（第一階段）")
                     st.markdown(thoughts)
                 
                 with col2:
-                    st.markdown("### ✨ 最終回應（第二階段）")
+                    st.markdown("### 🎤 川普的最終回應（第二階段）")
                     st.markdown(final_response)
                 
                 # 保存歷史
@@ -346,18 +361,18 @@ ollama serve
                     'response': final_response
                 })
                 
-                st.success("✅ 分析完成！")
+                st.success("✅ 川普已回應！")
                 
             except Exception as e:
                 st.error(f"❌ 錯誤: {str(e)}")
     
-    # 顯示歷史
+    # 顯示對話歷史
     if hasattr(st.session_state, 'cot_history') and st.session_state.cot_history:
         st.divider()
-        st.markdown("### 📝 對話歷史")
+        st.markdown("### � 川普的評論歷史")
         
         for i, item in enumerate(st.session_state.cot_history[-5:], 1):  # 只顯示最後 5 條
-            with st.expander(f"💬 記錄 {i}: {item['event'][:50]}..."):
-                st.markdown(f"**事件:** {item['event']}")
-                st.markdown(f"**思考:** {item['thoughts']}")
+            with st.expander(f"🎤 記錄 {i}: 「{item['event'][:40]}...」"):
+                st.markdown(f"**話題:** {item['event']}")
+                st.markdown(f"**評論:** {item['thoughts']}")
                 st.markdown(f"**回應:** {item['response']}")

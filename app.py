@@ -28,8 +28,8 @@ except ImportError as e:
 
 # 頁面配置
 st.set_page_config(
-    page_title="AI 混合應用 - CoT 對話 + 深度學習",
-    page_icon="🚀",
+    page_title="🤖 川普風格對話生成器",
+    page_icon="🎤",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -80,9 +80,9 @@ def render_header():
     """渲染應用頭部"""
     st.markdown("""
     <div style="text-align: center; margin-bottom: 30px;">
-        <h1 class="header-style">🚀 AI 混合應用平台</h1>
+        <h1 class="header-style">🤖 川普風格對話生成器</h1>
         <p style="font-size: 18px; color: #666;">
-            整合 Two-Stage CoT 對話軟體 + CRISP-DM 深度學習工具
+            使用 Two-Stage CoT AI 生成川普風格的評論和回應
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -253,7 +253,7 @@ def main():
     
     # 創建 Tabs
     tab1, tab2 = st.tabs([
-        "🤖 對話軟體 (Two-Stage CoT)",
+        "🎤 川普風格對話 (Two-Stage CoT)",
         "📊 深度學習工具 (CRISP-DM)"
     ])
     

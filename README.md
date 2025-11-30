@@ -1,6 +1,6 @@
-# 🚀 AI 混合應用平台
+# 🤖 川普風格對話生成器
 
-## 整合 Two-Stage CoT 對話軟體 + CRISP-DM 深度學習工具
+## 使用 Two-Stage CoT AI 和 Ollama 本地 LLM
 
 ### � 項目概述
 
