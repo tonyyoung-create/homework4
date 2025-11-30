@@ -1,0 +1,8 @@
+# 川普風格對話生成器 - Streamlit Cloud 雲端版本依賴
+# 適用於完全在雲端運行，無需本地 Ollama
+
+streamlit>=1.28.0
+transformers>=4.30.0
+torch>=2.0.0
+pandas>=2.0.0
+numpy>=1.24.0
