@@ -63,7 +63,8 @@ class TopicAnalyzer:
             "衰退", "下滑", "虧損", "災難", "糟糕", "惡劣", "腐敗", "堕落",
             "衝擊", "衰弱", "頹廢", "挑戰", "威脅", "風險", "死亡", "戰爭",
             "恐怖", "害怕", "擔心", "焦慮", "不安", "混亂", "無序", "貧窮",
-            "餓", "病", "傷", "罪", "邪惡", "黑暗", "污穢"
+            "餓", "病", "傷", "罪", "邪惡", "黑暗", "污穢", "難過", "悲傷",
+            "沮喪", "失望", "絕望", "憂鬱", "痛心", "傷心", "難受"
         ]
         
         # 正面關鍵詞
@@ -76,11 +77,9 @@ class TopicAnalyzer:
     
     def analyze_sentiment(self, topic: str) -> str:
         """分析話題的正負性"""
-        topic_lower = topic.lower()
-        
         # 計算正負關鍵詞的出現次數
-        negative_count = sum(1 for kw in self.negative_keywords if kw in topic_lower)
-        positive_count = sum(1 for kw in self.positive_keywords if kw in topic_lower)
+        negative_count = sum(1 for kw in self.negative_keywords if kw in topic)
+        positive_count = sum(1 for kw in self.positive_keywords if kw in topic)
         
         # 如果包含明確的負面關鍵詞
         if negative_count > positive_count:
