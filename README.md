@@ -1,17 +1,29 @@
-# 🤖 深度學習工作流應用 - CRISP-DM 方法論實踐
+# 🚀 AI 混合應用平台
 
-## 📚 項目概述
+## 整合 Two-Stage CoT 對話軟體 + CRISP-DM 深度學習工具
 
-本項目是一個完整的**深度學習應用**，遵循 **CRISP-DM** (Cross-industry standard Process for Data Mining) 方法論實現了機器學習的六個核心階段。應用提供了基於 **Streamlit** 的互動式界面，支持從數據理解到模型部署的端到端工作流。
+### � 項目概述
+
+本項目是一個**混合 AI 應用**，結合了：
+
+1. **🤖 Two-Stage Chain of Thought (CoT) 對話軟體**
+   - 使用 Ollama 進行本地 LLM 推理
+   - 將負面事件轉化為正能量思考
+   - 完全本地運行，無需 API 密鑰
+
+2. **📊 CRISP-DM 深度學習工具**
+   - 遵循 CRISP-DM 方法論的 6 階段工作流
+   - 完整的機器學習工程流程
+   - 支持 PyTorch 和 TensorFlow
 
 ### 🌟 核心特性
 
-- ✅ **完全本地運行** - 無需外部 API 密鑰
-- ✅ **CRISP-DM 6 階段** - 標準化的機器學習工作流
-- ✅ **互動式 Web 界面** - Streamlit 提供的流暢用戶體驗
-- ✅ **深度學習支持** - PyTorch 和 TensorFlow 雙框架
-- ✅ **雲端部署就緒** - 開箱即用的 Streamlit Community Cloud 配置
-- ✅ **完整文檔** - 從快速開始到深入細節的全套指南
+✅ **完全本地運行** - 無需外部 API 密鑰  
+✅ **Two-Stage CoT 架構** - 先思考後回應的智能對話  
+✅ **CRISP-DM 標準化流程** - 業界最佳實踐  
+✅ **互動式 Web 界面** - 基於 Streamlit 的流暢體驗  
+✅ **多模型支持** - Ollama 支持多種 LLM  
+✅ **雲端部署就緒** - 開箱即用的 Streamlit Community Cloud 配置
 
 ---
 
