@@ -1,32 +1,43 @@
 """
 Two-Stage Chain of Thought (CoT) 對話模組
-使用 Ollama 進行本地推理，不依賴外部 API
+使用 Ollama 進行本地或遠程推理，不依賴外部 API
 
 架構：
 1. 第一階段：生成思考過程（思考推理）
 2. 第二階段：基於思考過程生成最終回應
+
+支持遠程 Ollama：設置 OLLAMA_URL 環境變數
 """
 
 import requests
 import json
+import os
 from typing import Tuple, Dict, Optional
 import streamlit as st
 
 
 class OllamaCoTDialog:
-    """Ollama 驅動的 Two-Stage CoT 對話系統"""
+    """Ollama 驅動的 Two-Stage CoT 對話系統 - 支持本地和遠程"""
     
-    def __init__(self, model_name: str = "llama2", base_url: str = "http://localhost:11434"):
+    def __init__(self, model_name: str = "llama2", base_url: Optional[str] = None):
         """
-        初始化 Ollama CoT 對話系統
+        初始化 Ollama CoT 對話系統（支持本地和遠程）
         
         Args:
             model_name: 使用的模型名稱（需要先用 ollama pull 下載）
-            base_url: Ollama API 服務器地址
+            base_url: Ollama API 服務器地址。如果為 None，會讀取 OLLAMA_URL 環境變數，
+                     或使用本地默認 http://localhost:11434
         """
         self.model_name = model_name
-        self.base_url = base_url
-        self.api_endpoint = f"{base_url}/api/generate"
+        
+        # 優先級：參數 > 環境變數 > 本地默認
+        if base_url:
+            self.base_url = base_url
+        else:
+            # 嘗試從環境變數讀取（Streamlit Cloud 上使用）
+            self.base_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+        
+        self.api_endpoint = f"{self.base_url}/api/generate"
         
         # 系統提示詞 - 川普風格
         self.system_prompts = {
