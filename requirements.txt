@@ -2,6 +2,7 @@
 tensorflow>=2.13.0
 torch>=2.0.0
 torchvision>=0.15.0
+tf-keras>=2.13.0
 
 # Web 應用
 streamlit>=1.28.0
