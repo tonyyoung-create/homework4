@@ -45,41 +45,112 @@ st.markdown("""
 
 
 class TrumpCommentGenerator:
-    """川普風格評論生成器 - 簡單穩定版本"""
+    """川普風格評論生成器 - 增強版本，更多樣化的生成"""
     
     def __init__(self):
         """初始化生成器"""
-        self.trump_phrases = [
-            "GREAT", "FANTASTIC", "TREMENDOUS", "BEAUTIFUL", "TREMENDOUS",
-            "VERY SMART", "VERY STRONG", "INCREDIBLE", "AMAZING", "WONDERFUL",
-            "PERFECT", "EXCELLENT", "WINNING", "SUCCESSFUL", "POWERFUL"
+        # 擴展短語庫 - 各種強度和類型
+        self.positive_phrases = [
+            "GREAT", "FANTASTIC", "TREMENDOUS", "BEAUTIFUL", "MAGNIFICENT",
+            "WONDERFUL", "FANTASTIC", "INCREDIBLE", "AMAZING", "SPECTACULAR"
         ]
         
-        self.trump_templates = [
-            "這是 {phrase}！真的是 {phrase}！我見過很多，但這是最 {phrase} 的！",
-            "{phrase}！我告訴你，這是 {phrase} 的！非常 {phrase}！",
-            "我知道 {phrase} 的事物什麼樣子。這？這是 {phrase}！非常 {phrase}！",
+        self.intensifiers = [
+            "非常", "真的", "絕對", "完全", "實在", "簡直", "極其"
+        ]
+        
+        self.affirm_phrases = [
+            "VERY SMART", "VERY STRONG", "VERY GOOD", "VERY WISE", "VERY SHARP",
+            "VERY SMART MOVE", "VERY EXCELLENT CHOICE", "VERY WELL DONE"
+        ]
+        
+        self.superlatives = [
+            "最", "最最", "絕對是", "真的是", "我見過的最"
+        ]
+        
+        # 多樣化的評論範本 - 不同的句式結構
+        self.comment_templates_basic = [
+            "這是 {intensifier} {phrase} 的！真的，{intensifier} {phrase}！",
+            "{phrase}！我告訴你，這是 {intensifier} {phrase} 的！",
             "太 {phrase} 了！如果我沒親眼看到，我都不相信會這麼 {phrase}！",
-            "這是我見過最 {phrase} 的事情！真的，非常 {phrase}！"
+            "這是我見過 {superlative} {phrase} 的事情！真的，{intensifier} {phrase}！",
+            "{phrase}！{intensifier} {phrase}！{intensifier} {phrase}！"
         ]
         
-        self.final_response_templates = [
-            "讓我告訴你，這真的是 {phrase} 的！我見過很多，但這是最棒的。這真的是個 {phrase} 的決定。我知道成功，而這就是 {phrase}！- 川普",
-            "這是 {phrase}！完全 {phrase}！我可以告訴你，這會成為 {phrase} 的成功故事。相信我！- 川普",
-            "我很少給出 {phrase} 的評價，但這次我必須說 - 這真的是 {phrase}！做得很好！- 川普",
-            "{phrase}！這就是我想說的 - 完全 {phrase}！這會成為最大的 {phrase} 故事之一！- 川普",
-            "你知道什麼是真正 {phrase} 的嗎？這個！這就是 {phrase}！最好的！- 川普"
+        self.comment_templates_analytical = [
+            "我知道 {phrase} 的事物什麼樣子。這？這是 {phrase}！非常 {phrase}！",
+            "許多人說 {phrase}，但這 - 這是 {intensifier} {phrase}！",
+            "你知道我見過什麼？失敗。但這不是。這是 {intensifier} {phrase}！",
+            "我做過許多事，見過許多事。這？這是 {intensifier} {phrase} 的。相信我！"
+        ]
+        
+        self.comment_templates_comparison = [
+            "比起其他我見過的，這是 {superlative} {phrase} 的。{intensifier} {phrase}！",
+            "人們總是說好，但 {phrase}？這是另一個等級的 {phrase}！",
+            "我見過好，但這是 {intensifier} {superlative} {phrase}！",
+            "不，不，不 - 我說的是 {intensifier} {phrase}，而這正是！"
+        ]
+        
+        self.comment_templates_emphatic = [
+            "讓我告訴你 - {phrase}！完全 {phrase}！非常 {phrase}！",
+            "這就是我想說的一切：{phrase}！{intensifier} {phrase}！就是這樣！",
+            "我能想到的只有一個詞：{phrase}！{intensifier} {phrase}！",
+            "{phrase}。{phrase}。{intensifier} {phrase}。這就是全部！"
+        ]
+        
+        # 最終回應範本 - 更多變化
+        self.final_templates_strong = [
+            "讓我告訴你，這真的是 {phrase} 的！我見過很多，但這是 {superlative} 最 {phrase} 的。這是個 {intensifier} {phrase} 的決定。我知道成功，而這就是 {phrase}！- 川普",
+            "這是 {phrase}！完全 {phrase}！我可以告訴你，這會成為 {intensifier} {phrase} 的成功故事。相信我！- 川普"
+        ]
+        
+        self.final_templates_modest = [
+            "我很少給出 {phrase} 的評價，但這次我必須說 - 這真的是 {phrase}！做得 {intensifier} 好！- 川普",
+            "通常我對這種事很挑剔，但這？這是 {intensifier} {phrase}！非常好的工作！- 川普"
+        ]
+        
+        self.final_templates_rhetorical = [
+            "{phrase}！這就是我想說的 - 完全 {phrase}！這會成為 {superlative} 大的 {phrase} 故事之一！- 川普",
+            "你知道什麼是真正 {phrase} 的嗎？這個！這就是 {intensifier} {phrase}！最好的！- 川普"
         ]
     
     def generate_comment(self, topic: str) -> str:
-        """生成單個評論"""
-        phrase = random.choice(self.trump_phrases)
-        template = random.choice(self.trump_templates)
-        comment = template.format(phrase=phrase)
+        """生成單個評論 - 使用多樣化的方法"""
+        # 隨機選擇評論風格
+        comment_style = random.choice([
+            'basic', 'analytical', 'comparison', 'emphatic'
+        ])
         
-        # 添加話題相關內容
-        if random.random() > 0.5:
-            comment = f"關於{topic}：{comment}"
+        if comment_style == 'basic':
+            template = random.choice(self.comment_templates_basic)
+        elif comment_style == 'analytical':
+            template = random.choice(self.comment_templates_analytical)
+        elif comment_style == 'comparison':
+            template = random.choice(self.comment_templates_comparison)
+        else:  # emphatic
+            template = random.choice(self.comment_templates_emphatic)
+        
+        # 隨機選擇填充詞
+        phrase = random.choice(self.positive_phrases)
+        intensifier = random.choice(self.intensifiers)
+        superlative = random.choice(self.superlatives)
+        
+        # 格式化評論
+        comment = template.format(
+            phrase=phrase,
+            intensifier=intensifier,
+            superlative=superlative
+        )
+        
+        # 可選地添加話題前綴
+        if random.random() > 0.4:
+            prefixes = [
+                f"關於{topic}：",
+                f"當我看到{topic}時：",
+                f"說到{topic}：",
+                f"這個{topic}？"
+            ]
+            comment = random.choice(prefixes) + comment
         
         return comment
     
@@ -105,11 +176,28 @@ class TrumpCommentGenerator:
         return comments
     
     def generate_final_response(self, topic: str, comments: List[str]) -> str:
-        """生成最終回應"""
+        """生成最終回應 - 使用多樣的範本"""
         with st.spinner("⏳ 生成最終回應中..."):
-            phrase = random.choice(self.trump_phrases)
-            template = random.choice(self.final_response_templates)
-            response = template.format(phrase=phrase)
+            # 隨機選擇回應風格
+            response_style = random.choice(['strong', 'modest', 'rhetorical'])
+            
+            if response_style == 'strong':
+                template = random.choice(self.final_templates_strong)
+            elif response_style == 'modest':
+                template = random.choice(self.final_templates_modest)
+            else:  # rhetorical
+                template = random.choice(self.final_templates_rhetorical)
+            
+            # 隨機選擇填充詞
+            phrase = random.choice(self.positive_phrases)
+            intensifier = random.choice(self.intensifiers)
+            superlative = random.choice(self.superlatives)
+            
+            response = template.format(
+                phrase=phrase,
+                intensifier=intensifier,
+                superlative=superlative
+            )
             
             time.sleep(0.5)  # 模擬處理時間
             
