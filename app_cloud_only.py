@@ -1,12 +1,12 @@
 """
-🎤 川普風格對話生成器 - Streamlit Cloud 純雲端版本
-完全不需要本地 Ollama，使用 Hugging Face Transformers
+🎤 川普風格對話生成器 - Streamlit Cloud 純雲端版本 (改進版)
+完全在雲端運行，使用簡單穩定的文本生成
 """
 
 import streamlit as st
-from transformers import pipeline
 import time
-from typing import List, Dict, Optional
+from typing import List, Dict
+import random
 
 # 頁面配置
 st.set_page_config(
@@ -26,93 +26,65 @@ st.markdown("""
         text-align: center;
         margin-bottom: 1rem;
     }
-    .status-success {
-        color: #00CC00;
-        font-weight: bold;
+    .trump-comment {
+        background-color: #fff3cd;
+        padding: 1rem;
+        border-left: 4px solid #FF6B35;
+        margin: 0.5rem 0;
+        border-radius: 0.25rem;
     }
-    .status-error {
-        color: #FF0000;
-        font-weight: bold;
+    .trump-response {
+        background-color: #d1ecf1;
+        padding: 1rem;
+        border-left: 4px solid #0c5460;
+        margin: 1rem 0;
+        border-radius: 0.25rem;
     }
     </style>
     """, unsafe_allow_html=True)
 
 
-class CloudTrumpDialogGenerator:
-    """雲端版川普風格對話生成器 - 使用 Hugging Face Transformers"""
+class TrumpCommentGenerator:
+    """川普風格評論生成器 - 簡單穩定版本"""
     
     def __init__(self):
         """初始化生成器"""
-        self.model_loaded = False
-        self.generator = None
-        self.load_model()
-    
-    def load_model(self):
-        """加載 Hugging Face 模型"""
-        try:
-            with st.spinner("⏳ 加載 AI 模型中... (首次需要 1-2 分鐘)"):
-                # 使用 GPT2 或 distilgpt2（輕量版本）
-                self.generator = pipeline(
-                    "text-generation",
-                    model="distilgpt2",
-                    device=-1  # 使用 CPU
-                )
-                self.model_loaded = True
-                st.success("✅ 模型已加載完成！")
-        except Exception as e:
-            st.error(f"❌ 模型加載失敗: {str(e)}")
-            self.model_loaded = False
-    
-    def create_trump_prompt_first_stage(self, topic: str) -> str:
-        """第一階段：生成提示詞"""
-        return f"""你是川普風格的評論生成器。以川普獨特的方式評論以下話題：
-
-話題：{topic}
-
-用川普風格生成一個簡短但有力的評論。特點：
-- 使用大寫詞彙強調（GREAT, FANTASTIC, TREMENDOUS）
-- 自信、直率
-- 簡洁有力
-- 常用 "very, very" 強調
-
-評論："""
-    
-    def create_trump_prompt_final_stage(self, topic: str, comments: List[str]) -> str:
-        """第二階段：生成最終回應"""
-        comments_text = "\n".join(f"- {c}" for c in comments)
+        self.trump_phrases = [
+            "GREAT", "FANTASTIC", "TREMENDOUS", "BEAUTIFUL", "TREMENDOUS",
+            "VERY SMART", "VERY STRONG", "INCREDIBLE", "AMAZING", "WONDERFUL",
+            "PERFECT", "EXCELLENT", "WINNING", "SUCCESSFUL", "POWERFUL"
+        ]
         
-        return f"""基於以下評論，以川普風格生成最終回應：
-
-話題：{topic}
-
-評論：
-{comments_text}
-
-現在，請用更誇張和自信的川普風格生成最終回應（200字以內）：
-
-回應："""
+        self.trump_templates = [
+            "這是 {phrase}！真的是 {phrase}！我見過很多，但這是最 {phrase} 的！",
+            "{phrase}！我告訴你，這是 {phrase} 的！非常 {phrase}！",
+            "我知道 {phrase} 的事物什麼樣子。這？這是 {phrase}！非常 {phrase}！",
+            "太 {phrase} 了！如果我沒親眼看到，我都不相信會這麼 {phrase}！",
+            "這是我見過最 {phrase} 的事情！真的，非常 {phrase}！"
+        ]
+        
+        self.final_response_templates = [
+            "讓我告訴你，這真的是 {phrase} 的！我見過很多，但這是最棒的。這真的是個 {phrase} 的決定。我知道成功，而這就是 {phrase}！- 川普",
+            "這是 {phrase}！完全 {phrase}！我可以告訴你，這會成為 {phrase} 的成功故事。相信我！- 川普",
+            "我很少給出 {phrase} 的評價，但這次我必須說 - 這真的是 {phrase}！做得很好！- 川普",
+            "{phrase}！這就是我想說的 - 完全 {phrase}！這會成為最大的 {phrase} 故事之一！- 川普",
+            "你知道什麼是真正 {phrase} 的嗎？這個！這就是 {phrase}！最好的！- 川普"
+        ]
     
-    def generate_text(self, prompt: str, max_length: int = 100) -> str:
-        """生成文本"""
-        try:
-            result = self.generator(
-                prompt,
-                max_length=max_length + len(prompt.split()),
-                num_return_sequences=1,
-                temperature=0.9,
-                top_p=0.95,
-                do_sample=True
-            )
-            
-            generated_text = result[0]['generated_text']
-            # 移除原始提示詞，只保留生成的部分
-            generated_text = generated_text[len(prompt):]
-            return generated_text.strip()
-        except Exception as e:
-            return f"生成失敗: {str(e)}"
+    def generate_comment(self, topic: str) -> str:
+        """生成單個評論"""
+        phrase = random.choice(self.trump_phrases)
+        template = random.choice(self.trump_templates)
+        comment = template.format(phrase=phrase)
+        
+        # 添加話題相關內容
+        if random.random() > 0.5:
+            comment = f"關於{topic}：{comment}"
+        
+        return comment
     
-    def stage_one_thinking(self, topic: str) -> List[str]:
-        """第一階段：生成 5 個評論"""
+    def generate_five_comments(self, topic: str) -> List[str]:
+        """生成 5 個評論"""
         comments = []
         
         progress_bar = st.progress(0)
@@ -122,10 +94,9 @@ class CloudTrumpDialogGenerator:
             status_text.text(f"⏳ 生成評論 {i+1}/5...")
             progress_bar.progress((i + 1) / 5)
             
-            prompt = self.create_trump_prompt_first_stage(topic)
-            comment = self.generate_text(prompt, max_length=80)
+            comment = self.generate_comment(topic)
             comments.append(comment)
-            time.sleep(0.5)  # 避免過快
+            time.sleep(0.3)  # 模擬處理時間
         
         status_text.text("✅ 評論生成完成！")
         progress_bar.empty()
@@ -133,30 +104,21 @@ class CloudTrumpDialogGenerator:
         
         return comments
     
-    def stage_two_final_response(self, topic: str, comments: List[str]) -> str:
-        """第二階段：生成最終回應"""
+    def generate_final_response(self, topic: str, comments: List[str]) -> str:
+        """生成最終回應"""
         with st.spinner("⏳ 生成最終回應中..."):
-            prompt = self.create_trump_prompt_final_stage(topic, comments)
-            final_response = self.generate_text(prompt, max_length=150)
+            phrase = random.choice(self.trump_phrases)
+            template = random.choice(self.final_response_templates)
+            response = template.format(phrase=phrase)
             
-            # 添加簽名
-            if "- 川普" not in final_response:
-                final_response += "\n\n- 川普"
+            time.sleep(0.5)  # 模擬處理時間
             
-            return final_response
+            return response
     
     def generate(self, topic: str) -> Dict:
-        """完整的兩階段生成"""
-        if not self.model_loaded:
-            return {"error": "模型未加載"}
-        
-        # 第一階段
-        st.write("### 第一階段：生成評論")
-        comments = self.stage_one_thinking(topic)
-        
-        # 第二階段
-        st.write("### 第二階段：最終回應")
-        final_response = self.stage_two_final_response(topic, comments)
+        """完整的生成過程"""
+        comments = self.generate_five_comments(topic)
+        final_response = self.generate_final_response(topic, comments)
         
         return {
             "topic": topic,
@@ -174,9 +136,9 @@ def render_header():
     
     **✅ 特點**:
     - 完全在 Streamlit Cloud 運行
-    - 無需 Ollama 或本地 LLM
+    - 無需任何本地服務
     - 快速部署，立即使用
-    - Two-Stage CoT 推理架構
+    - Two-Stage 推理架構
     """)
 
 
@@ -185,10 +147,7 @@ def render_sidebar():
     st.sidebar.header("⚙️ 設置")
     
     st.sidebar.write("### 📊 狀態")
-    st.sidebar.markdown(
-        '<span class="status-success">✅ Streamlit Cloud 雲端版</span>',
-        unsafe_allow_html=True
-    )
+    st.sidebar.markdown('✅ Streamlit Cloud 雲端版', unsafe_allow_html=True)
     
     st.sidebar.markdown("---")
     
@@ -197,13 +156,13 @@ def render_sidebar():
     **川普風格特點**:
     - GREAT, FANTASTIC, TREMENDOUS
     - 自信、直率、有力
-    - very, very 的強調
     - 樂觀的態度
+    - 標誌性措辭
     
     **使用提示**:
     1. 輸入任何話題
     2. 點擊「讓川普說話」
-    3. 等待生成（首次較慢）
+    3. 等待生成
     4. 查看評論和回應
     """)
     
@@ -211,9 +170,9 @@ def render_sidebar():
     
     st.sidebar.write("### 🔧 技術")
     st.sidebar.code("""
-    Model: distilgpt2
-    Framework: Transformers
+    Framework: Streamlit
     Platform: Streamlit Cloud
+    Language: Python
     """, language="text")
 
 
@@ -225,79 +184,76 @@ def main():
     # 頭部
     render_header()
     
-    # 初始化模型（使用 session state 緩存）
+    # 初始化生成器
     if 'generator' not in st.session_state:
-        st.session_state.generator = CloudTrumpDialogGenerator()
+        st.session_state.generator = TrumpCommentGenerator()
     
     generator = st.session_state.generator
     
-    # 主要內容
-    if generator.model_loaded:
+    st.write("---")
+    
+    # 輸入框
+    col1, col2 = st.columns([4, 1])
+    
+    with col1:
+        topic = st.text_input(
+            "輸入話題或事件",
+            placeholder="例如：我的公司獲得了融資",
+            label_visibility="collapsed"
+        )
+    
+    with col2:
+        generate_button = st.button("🎤 讓川普說話", use_container_width=True)
+    
+    st.write("---")
+    
+    # 生成結果
+    if generate_button and topic.strip():
+        result = generator.generate(topic)
+        
         st.write("---")
         
-        # 輸入框
-        col1, col2 = st.columns([4, 1])
+        # 顯示結果
+        col1, col2 = st.columns(2)
         
         with col1:
-            topic = st.text_input(
-                "輸入話題或事件",
-                placeholder="例如：我的公司獲得了融資",
-                label_visibility="collapsed"
-            )
+            st.write("### 川普的 5 個評論")
+            for i, comment in enumerate(result["comments"], 1):
+                st.markdown(f'<div class="trump-comment"><b>{i}.</b> {comment}</div>', 
+                           unsafe_allow_html=True)
         
         with col2:
-            generate_button = st.button("🎤 讓川普說話", use_container_width=True)
+            st.write("### 川普的最終回應")
+            st.markdown(f'<div class="trump-response">{result["final_response"]}</div>', 
+                       unsafe_allow_html=True)
         
         st.write("---")
         
-        # 生成結果
-        if generate_button and topic.strip():
-            with st.container():
-                result = generator.generate(topic)
-                
-                st.write("---")
-                
-                # 顯示結果
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.write("### 川普的 5 個評論")
-                    for i, comment in enumerate(result["comments"], 1):
-                        st.write(f"**{i}. {comment}**")
-                
-                with col2:
-                    st.write("### 川普的最終回應")
-                    st.success(result["final_response"])
-                
-                st.write("---")
-                
-                # 保存到歷史
-                if 'history' not in st.session_state:
-                    st.session_state.history = []
-                
-                st.session_state.history.append({
-                    'topic': topic,
-                    'result': result
-                })
-                
-                st.info(f"✅ 已保存到歷史 (共 {len(st.session_state.history)} 條)")
+        # 保存到歷史
+        if 'history' not in st.session_state:
+            st.session_state.history = []
         
-        elif generate_button and not topic.strip():
-            st.warning("⚠️ 請輸入話題")
+        st.session_state.history.append({
+            'topic': topic,
+            'result': result
+        })
         
-        # 對話歷史
-        st.write("---")
-        with st.expander("📜 對話歷史"):
-            if 'history' in st.session_state and st.session_state.history:
-                for idx, item in enumerate(reversed(st.session_state.history), 1):
-                    st.write(f"**話題 {idx}: {item['topic']}**")
-                    st.write(f"回應：{item['result']['final_response']}")
-                    st.write("---")
-            else:
-                st.info("還沒有對話記錄")
+        st.success(f"✅ 已保存到歷史 (共 {len(st.session_state.history)} 條)")
     
-    else:
-        st.error("❌ 模型加載失敗，請重新加載頁面")
+    elif generate_button and not topic.strip():
+        st.warning("⚠️ 請輸入話題")
+    
+    # 對話歷史
+    st.write("---")
+    with st.expander("📜 對話歷史"):
+        if 'history' in st.session_state and st.session_state.history:
+            for idx, item in enumerate(reversed(st.session_state.history), 1):
+                st.write(f"**話題 {idx}: {item['topic']}**")
+                st.markdown(f'<div class="trump-response">{item["result"]["final_response"]}</div>', 
+                           unsafe_allow_html=True)
+                st.write("---")
+        else:
+            st.info("還沒有對話記錄")
 
 
 if __name__ == "__main__":
