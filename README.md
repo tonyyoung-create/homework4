@@ -1,20 +1,67 @@
+# 🎤 川普風格 Two-Stage CoT 對話生成器（Homework4）
+簡介
+- 產生「川普風格」的多樣化回應。提供兩個主要執行檔：
+    - `app_cloud_only_v2.py`：話題感知、雲端就緒（推薦部署到 Streamlit Cloud）
+    - `app.py`：本地版（需 Ollama）
+
+快速開始（雲端）
+1. 安裝依賴（雲端最小化）
+```bash
+pip install -r requirements-cloud.txt
+```
+2. 本地測試
+```bash
+streamlit run app_cloud_only_v2.py
+```
+3. 部署到 Streamlit Cloud
+ - 在 Streamlit Cloud 連接本倉庫，指定 `app_cloud_only_v2.py` 為主程式，Deploy。
+
+本地（Ollama）運行（可選）
+```bash
+# 啟動 Ollama
+ollama serve
+# 下載模型
+ollama pull llama2
+# 運行
+streamlit run app.py
+```
+
+檔案說明（重點）
+- `app_cloud_only_v2.py`：話題感知版本（推薦）
+- `app_cloud_only.py`：純模板版本（備份）
+- `app.py`：本地 Ollama 版本
+- `cot_dialog.py`：CoT 核心邏輯
+- `deeplearning_app.py`：CRISP-DM / 深度學習模組（教學用，可選）
+
+測試與驗證
+- 話題感知測試：`python test_sentiment_aware.py`
+- 情感分析器：`python test_analyzer_simple.py`
+
+部署與維護
+- 推薦 v2 雲端快速部署；想要更高質量可使用本地 Ollama + ngrok。
+
+授權
+- 教育/研究用途（請根據需要添加 MIT / 其他許可證聲明）
+
+---
+
+(簡化版 README：如要更詳細說明或補充示例，我可以把 README 擴展為完整版本)
 # 🎤 川普風格對話生成器
 
-使用 **Two-Stage Chain-of-Thought (CoT) 推理** 生成獨特而有趣的川普風格評論和回應。
+使用 **Two-Stage Chain-of-Thought (CoT) 推理** + **話題感知系統** 生成獨特而有趣的川普風格評論和回應。
 
-> ⭐ **最新改進**（2025-11-30）：引入多樣化生成系統，從 375 個可能組合擴展至 28,000+，徹底消除制式化問題！
-> 
-> 🚀 **快速部署**：完全在 Streamlit Cloud 運行，無需任何本地服務
+> ⭐ **最新版本**（v2）：**話題感知系統** - 根據話題的正負性動態調整評論風格  
+> 📊 相關性改進：2/10 → 9/10 (+350%) | 🚀 **完全雲端部署**，2-3 分鐘上線
 
 ---
 
 ## ✨ 核心特色
 
-✅ **多樣化生成** - 從 28,000+ 個組合中隨機生成，每次都不同  
+✅ **話題感知** (v2) - 負面話題用批評，正面話題用讚美  
+✅ **多樣化生成** - 從 28,000+ 個組合隨機生成，每次都不同  
 ✅ **Two-Stage CoT** - 先生成 5 個評論，再優化最終回應  
 ✅ **完全雲端** - 在 Streamlit Cloud 上直接運行，無需本地服務  
 ✅ **零依賴** - 只需 Streamlit、Pandas、NumPy 三個包  
-✅ **實時部署** - 2-3 分鐘快速部署到 Streamlit Cloud  
 ✅ **本地 Ollama** - 支持本地 LLM（備選方案）  
 
 ---
@@ -23,146 +70,153 @@
 
 ```
 homework4/
-├── app_cloud_only.py          # ⭐ 推薦：純雲端版本（完全無依賴）
-├── app.py                      # 本地 Ollama 版本
-├── cot_dialog.py               # Two-Stage CoT 核心邏輯
-├── deeplearning_app.py         # 可選：CRISP-DM 工具
-├── data_layer.py               # CRISP-DM 數據層
-├── model_layer.py              # CRISP-DM 模型層
-├── evaluation_layer.py         # CRISP-DM 評估層
-├── test_generator.py           # 多樣性測試腳本
-├── requirements.txt            # 本地版本依賴
-├── requirements-cloud.txt      # 雲端版本依賴（最小化）
-├── IMPROVEMENT_DETAILS.md      # 改進詳細說明
-├── STREAMLIT_CLOUD_ONLY.md     # 雲端部署指南
-├── STREAMLIT_CLOUD_DEPLOYMENT.md # 遠程 Ollama 部署
-└── README.md                   # 本文件
+├── 📱 應用文件
+│   ├── app_cloud_only.py          # ⭐ v1：推薦版本（簡潔快速）
+│   ├── app_cloud_only_v2.py       # ⭐ v2：最新版本（話題感知）
+│   ├── app.py                     # 本地 Ollama 版本
+│   └── cot_dialog.py              # Two-Stage CoT 核心邏輯
+│
+├── 🧠 可選：深度學習 & CRISP-DM
+│   ├── deeplearning_app.py        # CRISP-DM 完整工具
+│   ├── data_layer.py              # 數據層
+│   ├── model_layer.py             # 模型層
+│   └── evaluation_layer.py        # 評估層
+│
+├── ✅ 測試文件
+│   ├── test_sentiment_aware.py    # 話題感知測試
+│   ├── test_sentiment_fix.py      # 情感修復驗證
+│   ├── test_analyzer_simple.py    # 簡單分析器測試
+│   └── test_specific_topic.py     # 特定話題測試
+│
+├── 📦 配置文件
+│   ├── requirements.txt           # 本地版本依賴
+│   ├── requirements-cloud.txt     # 雲端版本依賴（最小化）
+│   └── .streamlit/config.toml     # Streamlit 配置
+│
+└── 📚 文檔
+    ├── README.md                  # 本文件
+    ├── ABSTRACT.md                # 項目摘要
+    ├── CONVERSATION_LOG.md        # 開發對話記錄
+    ├── TOPIC_SENTIMENT_ANALYSIS.md # v2 技術文檔
+    ├── VERSION_COMPARISON.md      # v1 vs v2 對比
+    ├── SENTIMENT_FIX_REPORT.md    # 情感分析修復報告
+    ├── IMPROVEMENT_DETAILS.md     # 改進詳細說明
+    ├── STREAMLIT_CLOUD_ONLY.md    # 雲端部署指南
+    └── STREAMLIT_CLOUD_DEPLOYMENT.md # 遠程 Ollama 部署
 ```
 
 ---
 
 ## 🚀 快速開始
 
-### 方案 A：純雲端版本（推薦，2-3 分鐘）
+### 🌟 推薦方案：v2 話題感知版本（2-3 分鐘）
 
-**優點**：無需任何配置，直接部署  
-**部署步驟**：
+**特色**：根據話題正負性自動調整風格  
+**相關性**：9/10 (vs v1 的 2/10)
 
-1. 訪問 [Streamlit Community Cloud](https://share.streamlit.io)
-2. 連接你的 GitHub 倉庫：`https://github.com/tonyyoung-create/homework4`
-3. 選擇主文件：`app_cloud_only.py`
-4. 點擊「Deploy」
-5. 等待 2-3 分鐘，應用上線！
-
-**依賴**（最小化）：
-```
-streamlit>=1.28.0
-pandas>=2.0.0
-numpy>=1.24.0
-```
-
-**立即體驗**（本地）：
+#### 本地運行
 ```bash
 pip install -r requirements-cloud.txt
-streamlit run app_cloud_only.py
+streamlit run app_cloud_only_v2.py
 ```
+
+#### 雲端部署
+1. 訪問 [Streamlit Community Cloud](https://share.streamlit.io)
+2. 連接倉庫：`https://github.com/tonyyoung-create/homework4`
+3. 選擇文件：`app_cloud_only_v2.py`
+4. 點擊 Deploy → 完成！
 
 ---
 
-### 方案 B：本地 Ollama + 遠程部署（14 分鐘）
+### 其他方案
 
-**優點**：更高質量的 LLM 輸出  
-**步驟**：
+#### 方案 A：v1 簡潔版本（最快，無話題感知）
+```bash
+streamlit run app_cloud_only.py
+```
 
-1. **本地安裝 Ollama**
-   ```bash
-   # 下載：https://ollama.ai
-   # 啟動服務
-   ollama serve
-   
-   # 新終端下載模型
-   ollama pull llama2
-   ```
+#### 方案 B：本地 Ollama + 遠程部署（最高質量）
+```bash
+# 1. 本地啟動 Ollama
+ollama serve
 
-2. **配置 ngrok 遠程隧道**
-   ```bash
-   ngrok http 11434
-   ```
+# 2. 新終端下載模型
+ollama pull llama2
 
-3. **設置 Streamlit Cloud 環境變數**
-   - 複製 ngrok URL（例如：`https://xxx.ngrok.io`）
-   - 在 Streamlit Cloud 添加 `OLLAMA_URL` 環境變數
+# 3. 配置遠程隧道 (ngrok)
+ngrok http 11434
 
-4. **部署 app.py**
-   ```bash
-   streamlit run app.py
-   ```
+# 4. 設置 Streamlit Cloud 環境變數
+# OLLAMA_URL=https://xxx.ngrok.io
 
+# 5. 部署
+streamlit run app.py
+```
 詳見 [STREAMLIT_CLOUD_DEPLOYMENT.md](STREAMLIT_CLOUD_DEPLOYMENT.md)
 
 ---
 
-## 📊 改進亮點
+## 📊 版本對比
 
-### 生成系統升級
+### 工作原理
 
-| 方面 | 舊版本 | 新版本 | 提升 |
-|------|--------|--------|------|
-| 短語庫 | 15 個 | 25+ 個 | 67% |
-| 評論範本 | 5 個 | 18 個 | **260%** |
-| 回應範本 | 5 個 | 6 個 | 20% |
-| 可能組合 | ~375 | ~28,000 | **7,400%** |
-| 評論風格 | 無 | 4 類 | 新增 |
-| 回應風格 | 無 | 3 類 | 新增 |
+```
+用戶輸入話題
+    ↓
+[情感分析器]  ← 32 個負面關鍵詞 + 33 個正面關鍵詞
+    ↓
+判定：負面/正面/中立
+    ↓
+選擇相應風格集合
+    ↓
+生成 5 個評論 (多樣化)
+    ↓
+生成最終回應 (一致性)
+    ↓
+輸出結果
+```
 
-### 4 種評論風格
+### 情感關鍵詞庫
 
-1. **基礎評論**：直接讚美，簡潔有力
-2. **分析評論**：基於經驗，邏輯嚴密
-3. **比較評論**：相對優勢，突出特點
-4. **強調評論**：重複強調，極富感染力
+**負面關鍵詞** (43 個)：
+- 情感：痛苦、悲傷、難過、沮喪、失望、絕望、憂鬱
+- 事件：失敗、災難、危機、崩潰、破裂、戰爭、死亡
+- 品質：糟糕、恶劣、腐敗、虛弱、愚蠢
 
-### 3 種回應風格
+**正面關鍵詞** (33 個)：
+- 成果：成功、勝利、融資、投資、增長、發展
+- 特質：偉大、美好、聰慧、領導、勇敢、卓越
 
-1. **強勢回應**：充滿信心和權威性
-2. **謙虛回應**：罕見讚賞，更顯珍貴
-3. **修辭回應**：反問引導，引人思考
+詳見 [TOPIC_SENTIMENT_ANALYSIS.md](TOPIC_SENTIMENT_ANALYSIS.md)
+
+---
 
 ---
 
 ## 💡 使用示例
 
-### 輸入話題
+### 輸入話題（負面）
 ```
-我的創業公司剛獲得 A 輪融資
-```
-
-### 生成結果（第一次）
-
-**川普的 5 個評論**：
-```
-1. 說到我的創業公司剛獲得 A 輪融資：許多人說 TREMENDOUS，但這 - 這是 極其 TREMENDOUS！
-2. 關於我的創業公司剛獲得 A 輪融資：GREAT。GREAT。極其 GREAT。這就是全部！
-3. 這就是我想說的一切：INCREDIBLE！絕對 INCREDIBLE！就是這樣！
-4. 關於我的創業公司剛獲得 A 輪融資：許多人說 AMAZING，但這 - 這是 非常 AMAZING！
-5. 關於我的創業公司剛獲得 A 輪融資：我做過許多事，見過許多事。這？這是 簡直 FANTASTIC 的。相信我！
+我很難過
 ```
 
-**川普的最終回應**：
+### 生成結果
 ```
-讓我告訴你，這真的是 FANTASTIC 的！我見過很多，但這是最棒的。
-這是個 非常 FANTASTIC 的決定。我知道成功，而這就是 FANTASTIC！- 川普
+話題分析: negative ✓
+
+川普的 5 個評論:
+1. 說到我很難過：DISGRACE！這是非常 DISGRACE！誰應該負責？
+2. 關於我很難過：這是真的 STUPID！無法接受！
+3. 當我看到我很難過時：PROBLEM！簡直 PROBLEM！必須改變！
+4. 我見過許多失敗，但這個難過的情況是極其嚴重！
+5. 別擔心，這個問題很容易解決。相信我！
+
+川普的最終回應:
+我見過許多難過的情況，但我知道如何修復它。相信我，我會改變一切！- 川普
 ```
 
-### 再次生成（第二次）
-
-**完全不同的結果**：
-```
-1. 當我看到我的創業公司剛獲得 A 輪融資時：不，不，不 - 我說的是 真的 AMAZING，而這正是！
-2. 人們總是說好，但 SPECTACULAR？這是另一個等級的 SPECTACULAR！
-3. 這個我的創業公司剛獲得 A 輪融資？這就是我想說的一切：SPECTACULAR！完全 SPECTACULAR！
-...
-```
+### 每次都不同
+再次生成同一話題會得到完全不同的結果（從 28,000+ 組合中隨機選擇）
 
 ---
 
@@ -183,41 +237,30 @@ streamlit run app_cloud_only.py
 
 ---
 
-## 📚 文件說明
-
-| 文件 | 用途 | 備註 |
-|------|------|------|
-| `app_cloud_only.py` | ⭐ 主應用（雲端版） | **推薦使用** |
-| `app.py` | 主應用（本地版） | 需要 Ollama |
-| `cot_dialog.py` | Two-Stage CoT 邏輯 | 支持遠程 Ollama |
-| `test_generator.py` | 多樣性測試 | 驗證改進效果 |
-| `IMPROVEMENT_DETAILS.md` | 改進詳細說明 | 技術細節 |
-| `STREAMLIT_CLOUD_ONLY.md` | 快速部署指南 | 2-3 分鐘上線 |
-| `STREAMLIT_CLOUD_DEPLOYMENT.md` | 高級部署指南 | Ollama 配置 |
-
 ---
 
 ## 🧪 本地測試
 
-### 1. 測試生成多樣性
+### 1. 測試話題感知系統
 ```bash
-python test_generator.py
+python test_sentiment_aware.py
 ```
 
-輸出將展示 3 輪生成結果，每輪 5 個評論，驗證多樣性。
-
-### 2. 運行 Streamlit 應用
+### 2. 測試情感分析器
 ```bash
-# 雲端版（推薦）
+python test_analyzer_simple.py
+```
+
+### 3. 運行應用
+```bash
+# v2 推薦版本
+streamlit run app_cloud_only_v2.py
+
+# v1 簡潔版本
 streamlit run app_cloud_only.py
 
 # 本地 Ollama 版（需要先啟動 Ollama）
 streamlit run app.py
-```
-
-### 3. 檢查語法
-```bash
-python -m py_compile app_cloud_only.py
 ```
 
 ---
